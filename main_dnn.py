@@ -23,8 +23,8 @@ import prepareData as ppData
 
 # hyper-params
 fe_fd = cfg.fe_mel_fd
-agg_num = 10        # concatenate frames
-hop = 10            # step_len
+agg_num = 50        # concatenate frames
+hop = 50            # step_len
 act = 'relu'
 n_hid = 500
 n_out = len( cfg.labels )
