@@ -4,6 +4,7 @@ librosa (python lib, for extract features)
 Hat (https://github.com/qiuqiangkong/Hat, for building NN model)
 
 Usage:
-1. run prepareData.py
-2. run main_dnn.py (you should modify the Hat path in this file)
-3. run recognize.py (you should modify the Hat path in this file)
+1. modify the paths in config.py
+2. run prepareData.py
+3. run main_dnn.py (you should modify the Hat path in this file)
+4. run recognize.py (you should modify the Hat path in this file)
