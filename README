@@ -1,0 +1,9 @@
+2016.05.29
+pre-requisites:
+librosa (python lib, for extract features)
+Hat (https://github.com/qiuqiangkong/Hat, for building NN model)
+
+Usage:
+1. run prepareData.py
+2. run main_dnn.py (you should modify the Hat path in this file)
+3. run recognize.py (you should modify the Hat path in this file)
