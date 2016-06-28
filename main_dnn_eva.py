@@ -1,10 +1,8 @@
 '''
-SUMMARY:  Dcase 2016 Task 4. Audio Tagging
-          Training time: 1 s/epoch. (Tesla M2090)
-          test f_value: 73% (thres=0.5), test EER=24%  after 50 epoches     
-          Try adjusting hyper-params, optimizer, longer epoches to get better results. 
+SUMMARY:  train model on all development set
 AUTHOR:   Qiuqiang Kong
-Created:  2016.05.29
+Created:  2016.06.28
+Modified: -
 --------------------------------------
 '''
 import sys
@@ -19,7 +17,7 @@ from Hat.preprocessing import sparse_to_categorical
 from Hat.optimizers import SGD, Rmsprop
 import Hat.backend as K
 import config as cfg
-import prepareData as ppData
+import prepareData_eva as ppData_eva
 
 # hyper-params
 fe_fd = cfg.fe_mel_fd
@@ -31,11 +29,9 @@ fold = 1
 n_out = len( cfg.labels )
 
 # prepare data
-tr_X, tr_y, te_X, te_y = ppData.GetAllData( fe_fd, agg_num, hop, fold )
+tr_X, tr_y = ppData_eva.GetAllData( fe_fd, cfg.cv_csv_path, agg_num, hop )
 [batch_num, n_time, n_freq] = tr_X.shape
-
 print tr_X.shape, tr_y.shape
-print te_X.shape, te_y.shape
 
 # build model
 md = Sequential()
@@ -53,9 +49,9 @@ md.summary()
 
 # callbacks
 # tr_err, te_err are frame based. To get event based err, run recognize.py
-validation = Validation( tr_x=tr_X, tr_y=tr_y, va_x=None, va_y=None, te_x=te_X, te_y=te_y, 
+validation = Validation( tr_x=tr_X, tr_y=tr_y, va_x=None, va_y=None, te_x=None, te_y=None, 
                          metric_types=['binary_crossentropy', 'prec_recall_fvalue'], call_freq=1, dump_path='Results/validation.p' )
-save_model = SaveModel( dump_fd='Md', call_freq=10 )
+save_model = SaveModel( dump_fd='Md_eva', call_freq=10 )
 callbacks = [ validation, save_model ]
 
 # optimizer
@@ -63,6 +59,6 @@ callbacks = [ validation, save_model ]
 optimizer = Rmsprop(1e-4)
 
 # fit model
-md.fit( x=tr_X, y=tr_y, batch_size=100, n_epoch=101, loss_type='binary_crossentropy', optimizer=optimizer, callbacks=callbacks )
+md.fit( x=tr_X, y=tr_y, batch_size=100, n_epoch=1001, loss_type='binary_crossentropy', optimizer=optimizer, callbacks=callbacks )
 
 # run recognize.py to get results. 
