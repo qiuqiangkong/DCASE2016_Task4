@@ -15,11 +15,18 @@ import os
 import sys
 import matplotlib.pyplot as plt
 from scipy import signal
-from scikits.audiolab import wavread
+import wavio
 import librosa
 import config as cfg
 import csv
 import scipy.stats
+
+### readwav
+def readwav( path ):
+    Struct = wavio.read( path )
+    wav = Struct.data.astype(float) / np.power(2, Struct.sampwidth*8-1)
+    fs = Struct.rate
+    return wav, fs
 
 # calculate mel feature
 def GetMel( wav_fd, fe_fd, n_delete ):
@@ -28,7 +35,7 @@ def GetMel( wav_fd, fe_fd, n_delete ):
     for na in names:
         print na
         path = wav_fd + '/' + na
-        wav, fs, enc = wavread( path )
+        wav, fs = readwav( path )
         if ( wav.ndim==2 ): 
             wav = np.mean( wav, axis=-1 )
         assert fs==cfg.fs
