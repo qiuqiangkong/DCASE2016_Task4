@@ -2,46 +2,46 @@
 SUMMARY:  predict and write out results of evaluation data
 AUTHOR:   Qiuqiang Kong
 Created:  2016.06.28
-Modified: -
+Modified: 2016.10.11 Modify variable name
 --------------------------------------
 '''
-import sys
-sys.path.append('/homes/qkong/my_code2015.5-/python/Hat')
 import pickle
 import numpy as np
 np.random.seed(1515)
 import scipy.stats
-from Hat.models import Sequential
-from Hat.layers.core import InputLayer, Flatten, Dense, Dropout
-from Hat.callbacks import SaveModel, Validation
-from Hat.preprocessing import sparse_to_categorical, mat_2d_to_3d
-from Hat.optimizers import Rmsprop
-from Hat.metrics import prec_recall_fvalue
-import Hat.backend as K
+from hat.models import Sequential
+from hat.layers.core import InputLayer, Flatten, Dense, Dropout
+from hat.callbacks import SaveModel, Validation
+from hat.preprocessing import sparse_to_categorical, mat_2d_to_3d
+from hat.optimizers import Rmsprop
+from hat import serializations
+from hat.metrics import prec_recall_fvalue
+import hat.backend as K
 import config as cfg
-import prepareData_eva as ppData_eva
+import prepare_dev_data as pp_dev_data
+import prepare_eva_data as pp_eva_data
 import csv
 import cPickle
 
 # hyper-params
-fe_fd = cfg.fe_mel_fd
-agg_num = 10
-hop = 10
+agg_num = 11
+hop = 15
 fold = 1
 n_labels = len( cfg.labels )
 
 # load model
-md = pickle.load( open( 'Md_eva/md100.p', 'rb' ) )
+md = serializations.load( cfg.eva_md_fd + '/md10.p' )
 
 # prepare data
-te_X = ppData_eva.GetAllData( fe_fd, cfg.eva_csv_path, agg_num, hop )
+te_X = pp_eva_data.GetAllData( cfg.eva_fe_mel_fd, cfg.eva_csv_path, agg_num, hop )
 
 # do recognize and evaluation
 thres = 0.4     # thres, tune to prec=recall
 n_labels = len( cfg.labels )
 
-
-fwrite = open('Results_eva/task4_results.txt', 'w')
+pp_dev_data.CreateFolder( cfg.eva_results_fd )
+txt_out_path = cfg.eva_results_fd+'/task4_results.txt'
+fwrite = open( txt_out_path, 'w')
 with open( cfg.eva_csv_path, 'rb') as f:
     reader = csv.reader(f)
     lis = list(reader)
@@ -52,7 +52,7 @@ with open( cfg.eva_csv_path, 'rb') as f:
         full_na = na + '.16kHz.wav'
         
         # get features, tags
-        fe_path = fe_fd + '/' + na + '.f'
+        fe_path = cfg.eva_fe_mel_fd + '/' + na + '.f'
         X = cPickle.load( open( fe_path, 'rb' ) )
         
         # aggregate data
@@ -66,3 +66,4 @@ with open( cfg.eva_csv_path, 'rb') as f:
             fwrite.write( full_na + ',' + cfg.id_to_lb[j1] + ',' + str(p_y_pred[j1]) + '\n' )
             
 fwrite.close()
+print "Write out to", txt_out_path, "successfully!"
