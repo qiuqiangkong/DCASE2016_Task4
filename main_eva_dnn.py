@@ -42,7 +42,7 @@ seq.add( Dropout( 0.1 ) )
 seq.add( Dense( n_hid, act=act ) )
 seq.add( Dropout( 0.1 ) )
 seq.add( Dense( n_out, act='sigmoid' ) )
-md = seq.combine()
+md = seq.compile()
 md.summary()
 
 # validation
